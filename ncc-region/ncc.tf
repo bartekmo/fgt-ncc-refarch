@@ -21,6 +21,10 @@ resource "google_compute_router" "left" {
   }
 }
 
+output "left_cr" {
+  value = google_compute_router.left
+}
+
 resource "google_network_connectivity_spoke" "left" {
   name          = "${var.prefix}${var.indx}-spoke-${var.netname_left}"
   location      = var.region
@@ -34,7 +38,7 @@ resource "google_network_connectivity_spoke" "left" {
         ip_address             = instances.value.network_interface[0].network_ip
       }
     }
-    site_to_site_data_transfer = false
+    site_to_site_data_transfer = true
   }
 }
 

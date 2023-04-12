@@ -28,3 +28,7 @@ variable "netname_fgsp" {
   default = "fgsp"
   type = string
 }
+
+variable "asns_left_ncc" {}
+variable "asns_right_ncc" {}
+variable "asns_fgt" {}

@@ -23,6 +23,15 @@ config system global
     set admintimeout 50
 end
 
+config system interface
+  edit port2
+    set dhcp-classless-route-addition enable
+  next
+  edit port3
+    set dhcp-classless-route-addition enable
+  next
+end
+
 config system sdn-connector
     edit "gcp"
         set type gcp
