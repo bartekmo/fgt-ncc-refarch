@@ -61,6 +61,21 @@ config system standalone-cluster
     end
 end
 
+config router route-map
+    edit "cross-reg-med"
+        set comments "Discriminate cross-regional routes"
+        config rule
+            edit 1
+                set match-metric 100
+                set set-metric 100
+            next
+            edit 2
+                set set-metric 12000
+            next
+        end
+    next
+end
+
 config router bgp
   set as ${my_asn}
   set ebgp-multipath enable
@@ -72,12 +87,14 @@ config router bgp
       set ebgp-enforce-multihop enable
       set interface port1
       set soft-reconfiguration enable
+      set route-map-out cross-reg-med
     next
     edit ${left_nic1}
       set remote-as ${left_asn}
       set ebgp-enforce-multihop enable
       set interface port1
       set soft-reconfiguration enable
+      set route-map-out cross-reg-med
     next
     edit ${right_nic0}
       set remote-as ${right_asn}
