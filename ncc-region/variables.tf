@@ -92,3 +92,7 @@ variable service_account {
 }
 
 variable hub {}
+
+variable custom_ip_ranges {
+  description = "List of CIDRs to additionally advertise from right cloud router"
+}

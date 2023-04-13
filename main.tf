@@ -15,11 +15,10 @@ module "ncc_region" {
   net_right     = google_compute_network.right
   net_fgsp      = google_compute_network.fgsp
 
-  ## TODO: parametrize it
-  #asn_left_ncc  = "65${index(var.regions, each.key)}10"
-  #asn_right_ncc = "65${index(var.regions, each.key)}20"
-  #asn_fgt       = "65${index(var.regions, each.key)}01"
-  asn_left_ncc = var.asns_left_ncc[index(var.regions, each.key)]
+  asn_left_ncc  = var.asns_left_ncc[index(var.regions, each.key)]
   asn_right_ncc = var.asns_right_ncc[index(var.regions, each.key)]
-  asn_fgt = var.asns_fgt[index(var.regions, each.key)]
+  asn_fgt       = var.asns_fgt[index(var.regions, each.key)]
+
+//  custom_ip_ranges = var.wrkld_cidrs[each.key] #single region annoncements
+  custom_ip_ranges = flatten(values(var.wrkld_cidrs))
 }

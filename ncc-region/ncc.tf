@@ -114,6 +114,12 @@ resource "google_compute_router" "right" {
     advertised_groups = [
       "ALL_SUBNETS"
     ]
+    dynamic "advertised_ip_ranges" {
+      for_each = var.custom_ip_ranges
+      content {
+        range = advertised_ip_ranges.value
+      }
+    }
   }
 }
 

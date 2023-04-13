@@ -32,3 +32,7 @@ variable "netname_fgsp" {
 variable "asns_left_ncc" {}
 variable "asns_right_ncc" {}
 variable "asns_fgt" {}
+
+variable "wrkld_cidrs" {
+  type = map(list(string))
+}
