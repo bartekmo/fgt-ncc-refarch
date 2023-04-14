@@ -3,6 +3,7 @@ resource "google_compute_network" "wrkld" {
 
   name = "${var.prefix}-wrklds"
   auto_create_subnetworks = false
+  delete_default_routes_on_create = true
 }
 
 resource "google_compute_firewall" "wrkld_allowall" {

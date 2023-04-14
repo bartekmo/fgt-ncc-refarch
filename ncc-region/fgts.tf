@@ -14,7 +14,8 @@ data "google_compute_default_service_account" "default" {
 locals {
   zones = [
     var.zones[0]  != "" ? var.zones[0] : data.google_compute_zones.zones_in_region.names[0],
-    var.zones[1]  != "" ? var.zones[1] : data.google_compute_zones.zones_in_region.names[1]
+    var.zones[1]  != "" ? var.zones[1] : data.google_compute_zones.zones_in_region.names[1],
+    var.zones[1]  != "" ? var.zones[2] : data.google_compute_zones.zones_in_region.names[2]
   ]
 }
 
@@ -25,7 +26,7 @@ resource "google_compute_disk" "logdisk" {
   name                   = "${var.prefix}${var.indx}disk-logdisk${count.index+1}"
   size                   = var.logdisk_size
   type                   = "pd-ssd"
-  zone                   = local.zones[count.index]
+  zone                   = local.zones[count.index % length(local.zones)]
 }
 
 
