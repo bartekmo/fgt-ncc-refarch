@@ -76,6 +76,42 @@ config router route-map
     next
 end
 
+config router prefix-list
+    edit "fgt-nets"
+        config rule
+            edit 1
+                set action deny
+                set prefix 172.20.0.0 255.255.255.240
+                unset ge
+                unset le
+            next
+            edit 2
+                set action deny
+                set prefix 172.20.0.16 255.255.255.240
+                unset ge
+                unset le
+            next
+            edit 3
+                set action deny
+                set prefix 172.20.1.0 255.255.255.240
+                unset ge
+                unset le
+            next
+            edit 4
+                set action deny
+                set prefix 172.20.1.16 255.255.255.240
+                unset ge
+                unset le
+            next
+            edit 5
+                set prefix any
+                unset ge
+                unset le
+            next
+        end
+    next
+end
+
 config router bgp
   set as ${my_asn}
   set ebgp-multipath enable
@@ -87,26 +123,30 @@ config router bgp
       set ebgp-enforce-multihop enable
       set interface port1
       set soft-reconfiguration enable
-      set route-map-out cross-reg-med
+      set prefix-list-out fgt-nets
     next
     edit ${left_nic1}
       set remote-as ${left_asn}
       set ebgp-enforce-multihop enable
       set interface port1
       set soft-reconfiguration enable
-      set route-map-out cross-reg-med
+      set prefix-list-out fgt-nets
     next
     edit ${right_nic0}
       set remote-as ${right_asn}
       set ebgp-enforce-multihop enable
       set interface port2
       set soft-reconfiguration enable
+      set route-map-out cross-reg-med
+      set prefix-list-out fgt-nets
     next
     edit ${right_nic1}
       set remote-as ${right_asn}
       set ebgp-enforce-multihop enable
       set interface port2
       set soft-reconfiguration enable
+      set route-map-out cross-reg-med
+      set prefix-list-out fgt-nets
     next
   end
 end

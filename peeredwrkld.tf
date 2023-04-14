@@ -5,6 +5,17 @@ resource "google_compute_network" "wrkld" {
   auto_create_subnetworks = false
 }
 
+resource "google_compute_firewall" "wrkld_allowall" {
+  count = sum([ for k,v in var.wrkld_cidrs : length(v) ]) > 0 ? 1 : 0
+
+  name = "${var.prefix}-fw-wrklds-allowall"
+  network = google_compute_network.wrkld[0].self_link
+  allow {
+    protocol = "all"
+  }
+  source_ranges = ["0.0.0.0/0"]
+}
+
 resource "google_compute_network_peering" "right_wrkld" {
   count = sum([ for k,v in var.wrkld_cidrs : length(v) ]) > 0 ? 1 : 0
 
@@ -39,4 +50,27 @@ resource "google_compute_subnetwork" "wrklds1" {
   ip_cidr_range = each.value
   region = keys(var.wrkld_cidrs)[1]
   network = google_compute_network.wrkld[0].id
+}
+
+#######################
+
+resource "google_compute_instance" "srv0" {
+  name = "${var.prefix}-srv0"
+  zone = "${values(google_compute_subnetwork.wrklds0)[0].region}-b"
+  machine_type = "e2-medium"
+
+  boot_disk {
+    initialize_params {
+      image = "ubuntu-os-cloud/ubuntu-2204-lts"
+    }
+  }
+
+  network_interface {
+    subnetwork = values(google_compute_subnetwork.wrklds0)[0].id
+  }
+
+  metadata_startup_script =<<EOT
+apt update
+apt install nginx -y
+EOT
 }

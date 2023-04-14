@@ -1,3 +1,15 @@
+terraform {
+  required_version = ">= 1.0.1"
+  required_providers {
+    google = {
+      source = "hashicorp/google"
+    }
+    google-beta = {
+      source = "hashicorp/google-beta"
+    }
+  }
+}
+
 resource "google_compute_subnetwork" "left" {
   name = "${var.prefix}-${var.netname_left}"
   region = var.region

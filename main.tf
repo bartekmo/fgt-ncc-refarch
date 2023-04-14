@@ -22,3 +22,7 @@ module "ncc_region" {
 //  custom_ip_ranges = var.wrkld_cidrs[each.key] #single region annoncements
   custom_ip_ranges = flatten(values(var.wrkld_cidrs))
 }
+
+output "frontend_eips" {
+  value = [ for ncc in module.ncc_region : ncc.frontend_eip ]
+}

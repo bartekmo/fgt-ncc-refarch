@@ -1,7 +1,14 @@
+/*  This file adds on-prem network with 4 VPN tunnels faking Interconnect
+ *  You will get 4 tunnels, 4 BGP peers, 2 additional NCC spokes in 2 regions.
+ *
+ *  NOTE: deploying this will fail if your regions don't support site-to-site NCC.
+ */
+
+
 resource "google_compute_network" "onprem" {
   name = "${var.prefix}-onprem"
   auto_create_subnetworks = false
-  routing_mode = "REGIONAL"
+  routing_mode = "GLOBAL"
 }
 
 resource "google_compute_subnetwork" "onprem1" {
@@ -150,6 +157,7 @@ resource "google_compute_router_peer" "cloud1_onprem1" {
   peer_asn                  = google_compute_router.onprem1.bgp[0].asn
   advertised_route_priority = 100
   interface                 = google_compute_router_interface.cloud1_nic0.name
+  advertise_mode            = "CUSTOM"
 }
 
 resource "google_compute_router_peer" "onprem1_cloud1b" {
@@ -169,6 +177,7 @@ resource "google_compute_router_peer" "cloud1_onprem1b" {
   peer_asn                  = google_compute_router.onprem1.bgp[0].asn
   advertised_route_priority = 100
   interface                 = google_compute_router_interface.cloud1_nic1.name
+  advertise_mode            = "CUSTOM"
 }
 
 ####################
@@ -261,6 +270,7 @@ resource "google_compute_router_peer" "cloud2_onprem2" {
   peer_asn                  = google_compute_router.onprem2.bgp[0].asn
   advertised_route_priority = 100
   interface                 = google_compute_router_interface.cloud2_nic0.name
+  advertise_mode            = "CUSTOM"
 }
 
 resource "google_compute_router_peer" "onprem2_cloud2b" {
@@ -280,4 +290,37 @@ resource "google_compute_router_peer" "cloud2_onprem2b" {
   peer_asn                  = google_compute_router.onprem2.bgp[0].asn
   advertised_route_priority = 100
   interface                 = google_compute_router_interface.cloud2_nic1.name
+  advertise_mode            = "CUSTOM"
+}
+
+###################################
+# NCC
+
+resource "google_network_connectivity_spoke" "tun1" {
+  name          = "${var.prefix}-tun1"
+  location      = var.regions[0]
+  hub           = google_network_connectivity_hub.hub.id
+
+  linked_vpn_tunnels {
+    site_to_site_data_transfer = true
+    uris = [
+      google_compute_vpn_tunnel.cl_dc1_0.id,
+      google_compute_vpn_tunnel.cl_dc1_1.id,
+    ]
+  }
+}
+
+
+resource "google_network_connectivity_spoke" "tun2" {
+  name          = "${var.prefix}-tun2"
+  location      = var.regions[1]
+  hub           = google_network_connectivity_hub.hub.id
+
+  linked_vpn_tunnels {
+    site_to_site_data_transfer = true
+    uris = [
+      google_compute_vpn_tunnel.cl_dc2_0.id,
+      google_compute_vpn_tunnel.cl_dc2_1.id,
+    ]
+  }
 }
