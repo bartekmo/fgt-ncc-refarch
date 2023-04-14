@@ -26,11 +26,11 @@ resource "google_compute_region_backend_service" "front" {
   load_balancing_scheme = "EXTERNAL"
   protocol = "UNSPECIFIED"
 
-  backend {
-    group = google_compute_instance_group.front[0].id
-  }
-  backend {
-    group = google_compute_instance_group.front[1].id
+  dynamic "backend" {
+    for_each = google_compute_instance_group.front[*].id
+    content {
+      group = backend.value
+    }
   }
 }
 
